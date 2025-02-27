@@ -3,13 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Il mio sito personale - Labirinto</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+    <title>Maze Runner</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+        #app {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .game-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        #help-section {
+            width: 300px;
+            margin-left: 20px;
+        }
+        #bfs-code {
+            background-color: #34495e;
+            border: 2px solid #e74c3c;
+            border-radius: 10px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ecf0f1;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        #instructions {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #34495e;
+            border: 3px solid #e74c3c;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        #game-container {
+            position: relative;
+        }
+        #maze-canvas {
+            border: 3px solid #e74c3c;
+            background-color: #34495e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #f1c40f;
+            font-size: 18px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        h2 {
+            color: #f1c40f;
+            text-shadow: 2px 2px #c0392b;
+        }
+        button {
+            background-color: #e74c3c;
+            color: #ecf0f1;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .code-display {
+            color: white;
+            background-color: #333;  /* Dark background for contrast */
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+    <script>
+        Vue.options.delimiters = ['[[', ']]'];
+    </script>
 </head>
 <body>
-    <h1>Labirinto 2D</h1>
-    <div id="game-container"></div>
-    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+    <div id="app">
+        <div class="game-section">
+            <div id="instructions">
+                <h2>Maze Runner</h2>
+                <p>Guide the hero to the treasure!</p>
+                <p>Controls:</p>
+                <ul>
+                    <li>W / ↑: Up</li>
+                    <li>S / ↓: Down</li>
+                    <li>A / ←: Left</li>
+                    <li>D / →: Right</li>
+                </ul>
+                <div class="stats">
+                    <span>Steps: {{ steps }}</span>
+                    <span>Time: {{ formattedTime }}</span>
+                </div>
+                <button @click="resetGame">New Game</button>
+            </div>
+            <div id="game-container">
+                <canvas id="maze-canvas" ref="mazeCanvas"></canvas>
+                <div v-if="gameWon" class="overlay">
+                    <p>Victory!<br>Steps: {{ steps }}<br>Time: {{ formattedTime }}</p>
+                </div>
+            </div>
+        </div>
+        <div id="help-section">
+            <button @click="toggleHelp">
+                {{ showHelp ? 'Hide Help' : 'Need Help?' }}
+            </button>
+            <div v-if="showHelp">
+                <h3>BFS Algorithm (Python)</h3>
+                <pre id="bfs-code">{{ bfsCode }}</pre>
+                <button @click="runBFS">Show Shortest Path</button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='maze.js') }}"></script>
 </body>
 </html>
